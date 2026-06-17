@@ -1,0 +1,6 @@
+org\example\cargame\ColorComponentTests$DummyModel.class
+org\example\cargame\PersistenceTests.class
+org\example\cargame\CarGameApplicationTests.class
+org\example\cargame\ColorComponentTests.class
+org\example\cargame\CreateDeleteTest.class
+org\example\cargame\DijkstraTest.class
