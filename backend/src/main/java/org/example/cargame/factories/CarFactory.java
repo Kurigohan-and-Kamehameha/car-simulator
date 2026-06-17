@@ -1,6 +1,6 @@
 package org.example.cargame.factories;
 
-import org.example.cargame.CarModel;
+import org.example.cargame.model.CarModel;
 import org.example.cargame.components.*;
 import org.example.cargame.engine.Engine;
 import org.example.cargame.entity.EntityId;

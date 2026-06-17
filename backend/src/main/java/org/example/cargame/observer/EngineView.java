@@ -1,6 +1,6 @@
 package org.example.cargame.observer;
 
-import org.example.cargame.CarModel;
+import org.example.cargame.model.HasEngines;
 import org.example.cargame.entity.EntityId;
 import org.example.cargame.enums.EngineType;
 import org.example.cargame.snapshot.EngineSnapshot;
@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class EngineView extends ParentView<CarModel> implements PushObserver<EngineSnapshot> {
+public class EngineView extends ParentView<HasEngines> implements PushObserver<EngineSnapshot> {
     private final Map<EntityId, EngineSnapshot> cache = new ConcurrentHashMap<>();
 
-    public EngineView(CarModel model, ObserverDispatcher dispatcher) {
+    public EngineView(HasEngines model, ObserverDispatcher dispatcher) {
         super(model, dispatcher);
 
         bind();

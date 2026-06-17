@@ -5,6 +5,7 @@ import org.example.cargame.enums.NodeType;
 import org.example.cargame.enums.State;
 import org.example.cargame.graph.Edge;
 import org.example.cargame.graph.Node;
+import org.example.cargame.model.CarModel;
 import org.example.cargame.observer.GameStateView;
 import org.example.cargame.observer.ObserverDispatcher;
 import org.example.cargame.snapshot.*;
@@ -113,22 +114,29 @@ public class PhysicsEngine {
     }
 
     public void notifyObservers() {
+        lastSentStates.keySet().retainAll(model.getAllEntities());
+
         for (EntityId id : model.getAllEntities()) {
             State currentState = model.getStates().get(id).getSnapshot().state();
             State lastState = lastSentStates.get(id);
 
             if (currentState == State.DRIVE || currentState != lastState) {
 
-                PositionSnapshot posSnap = model.getPositions().get(id).getSnapshot();
-                StateSnapshot stateSnap = model.getStates().get(id).getSnapshot();
-                MessageSnapshot messageSnap = model.getMessages().get(id).getSnapshot();
-                EnergyStorageSnapshot storageSnap = model.getStorage().get(id).getSnapshot();
+                var posComp = model.getPositions().get(id);
+                var stateComp = model.getStates().get(id);
+                var messageComp = model.getMessages().get(id);
+                var storageComp = model.getStorage().get(id);
+
+                var posSnap = posComp.getSnapshot();
+                var stateSnap = stateComp.getSnapshot();
+                var messageSnap = messageComp.getSnapshot();
+                var storageSnap = storageComp.getSnapshot();
 
                 dispatcher.dispatch(() -> {
-                    model.getPositions().get(id).notifyObservers(id, posSnap);
-                    model.getStates().get(id).notifyObservers(id, stateSnap);
-                    model.getMessages().get(id).notifyObservers(id, messageSnap);
-                    model.getStorage().get(id).notifyObservers(id, storageSnap);
+                    posComp.notifyObservers(id, posSnap);
+                    stateComp.notifyObservers(id, stateSnap);
+                    messageComp.notifyObservers(id, messageSnap);
+                    storageComp.notifyObservers(id, storageSnap);
 
                     gameStateView.update(id);
                 });

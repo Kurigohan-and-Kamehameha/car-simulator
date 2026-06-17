@@ -5,6 +5,7 @@ import org.example.cargame.graph.Node;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 @Component
 public class Dijkstra {
@@ -23,15 +24,18 @@ public class Dijkstra {
 
         while (!pq.isEmpty()) {
             Node current = pq.poll();
-            if (visited.contains(current)) continue;
+            if (visited.contains(current))
+                continue;
             visited.add(current);
 
-            if (current.equals(target)) break;
+            if (current.equals(target))
+                break;
 
             for (Edge edge : current.getEdges()) {
                 Node neighbor = edge.getFrom().equals(current) ? edge.getTo() : edge.getFrom();
 
-                if (visited.contains(neighbor)) continue;
+                if (visited.contains(neighbor))
+                    continue;
 
                 double alt = dist.get(current) + edge.getWeight();
                 if (alt < dist.get(neighbor)) {
@@ -63,5 +67,41 @@ public class Dijkstra {
         Collections.reverse(path);
 
         return path;
+    }
+
+    public double minDistanceToNearest(Node source, Predicate<Node> filter, Collection<Node> allNodes) {
+        Map<Node, Double> dist = new HashMap<>();
+        Set<Node> visited = new HashSet<>();
+        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingDouble(dist::get));
+
+        for (Node node : allNodes) {
+            dist.put(node, Double.POSITIVE_INFINITY);
+        }
+        dist.put(source, 0.0);
+        pq.add(source);
+
+        while (!pq.isEmpty()) {
+            Node current = pq.poll();
+            if (visited.contains(current))
+                continue;
+            visited.add(current);
+
+            for (Edge edge : current.getEdges()) {
+                Node neighbor = edge.getFrom().equals(current) ? edge.getTo() : edge.getFrom();
+                if (visited.contains(neighbor))
+                    continue;
+                double alt = dist.get(current) + edge.getWeight();
+                if (alt < dist.get(neighbor)) {
+                    dist.put(neighbor, alt);
+                    pq.add(neighbor);
+                }
+            }
+        }
+
+        return allNodes.stream()
+                .filter(filter)
+                .mapToDouble(n -> dist.getOrDefault(n, Double.POSITIVE_INFINITY))
+                .min()
+                .orElse(Double.POSITIVE_INFINITY);
     }
 }

@@ -8,4 +8,5 @@ public class ViewSubject extends Subject<Observer> {
     public void notifyObservers(EntityId id) {
         observers.forEach(o -> o.update(id));
     }
+
 }

@@ -1,6 +1,6 @@
 package org.example.cargame.persistence;
 
-import org.example.cargame.CarModel;
+import org.example.cargame.model.CarModel;
 
 public final class SnapshotBuilder {
 

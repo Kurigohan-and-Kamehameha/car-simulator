@@ -6,6 +6,7 @@ import org.example.cargame.components.StateComponent;
 import org.example.cargame.entity.EntityId;
 import org.example.cargame.enums.State;
 import org.example.cargame.factories.EngineFactory;
+import org.example.cargame.model.CarModel;
 import org.example.cargame.persistence.GameLoader;
 import org.example.cargame.persistence.LoadedGameData;
 import org.example.cargame.persistence.PersistenceLayerDataBase;

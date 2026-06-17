@@ -1,5 +1,6 @@
 package org.example.cargame;
 
+import org.example.cargame.model.CarModel;
 import org.example.cargame.observer.GameStateView;
 import org.example.cargame.observer.ObserverDispatcher;
 import org.jspecify.annotations.NonNull;

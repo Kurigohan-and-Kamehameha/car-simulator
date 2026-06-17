@@ -58,19 +58,20 @@ public class GameStateView implements Observer {
     @Override
     public void update(EntityId id) {
         PositionSnapshot snapPos = positionView.getPosition(id);
-        EngineType engineType = engineView.getEngineType(id);
-        EnergyStorage energyStorage = storageView.getEnergyStorages(id).get(engineType);
         if (snapPos == null) {
             return;
         }
+        EngineType engineType = engineView.getEngineType(id);
         if (engineType == null) {
             return;
         }
+        EnergyStorage energyStorage = storageView.getEnergyStorages(id).get(engineType);
         if (energyStorage == null) {
             return;
         }
 
         GameStateDTO dto = new GameStateDTO(
+                id.getId(),
                 snapPos.x(),
                 snapPos.y(),
                 colorView.getColor(id),

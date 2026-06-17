@@ -4,6 +4,7 @@ import org.example.cargame.enums.EngineType;
 import org.example.cargame.enums.State;
 
 public record GameStateDTO(
+        int id,
         double x,
         double y,
         String color,

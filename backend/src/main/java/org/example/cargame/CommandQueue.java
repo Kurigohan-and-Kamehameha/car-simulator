@@ -10,10 +10,12 @@ public class CommandQueue {
 
     private final BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(1000);
 
-    public void submit(Runnable command) {
+    public boolean submit(Runnable command) {
         if (!queue.offer(command)) {
             System.out.println("CommandQueue full! Dropping command.");
+            return false;
         }
+        return true;
     }
 
     public void executeAll() {

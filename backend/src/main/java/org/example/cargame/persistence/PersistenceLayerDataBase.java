@@ -42,6 +42,15 @@ public class PersistenceLayerDataBase {
 
     @Transactional
     public void save(LoadedGameData data) {
+        stateRepo.deleteAll();
+        speedRepo.deleteAll();
+        positionRepo.deleteAll();
+        colorRepo.deleteAll();
+        engineRepo.deleteAll();
+        pathRepo.deleteAll();
+        messageRepo.deleteAll();
+        energyRepo.deleteAll();
+
         data.states().forEach((id, state) -> {
             StateComponentEntity entity = new StateComponentEntity();
             entity.setId((long) id.getId());
@@ -118,8 +127,8 @@ public class PersistenceLayerDataBase {
             EnergyStorageComponentEntity entity = new EnergyStorageComponentEntity();
             entity.setId((long) id.getId());
             Map<EngineType, EnergyStorageData> entityMap = new HashMap<>();
-            snap.storageList().forEach((type, storageRecord) ->
-                entityMap.put(type, new EnergyStorageData(storageRecord.power(), storageRecord.capacity())));
+            snap.storageList().forEach((type, storageRecord) -> entityMap.put(type,
+                    new EnergyStorageData(storageRecord.power(), storageRecord.capacity())));
             entity.setStorages(entityMap);
             energyRepo.save(entity);
         });
@@ -202,8 +211,8 @@ public class PersistenceLayerDataBase {
             EntityId id = new EntityId(entity.getId().intValue());
             Map<EngineType, EnergyStorage> snapshotMap = new HashMap<>();
             if (entity.getStorages() != null) {
-                entity.getStorages().forEach((type, dbData) ->
-                    snapshotMap.put(type, new EnergyStorage(dbData.power(), dbData.capacity())));
+                entity.getStorages().forEach(
+                        (type, dbData) -> snapshotMap.put(type, new EnergyStorage(dbData.power(), dbData.capacity())));
             }
             data.storage().put(id, new EnergyStorageSnapshot(snapshotMap));
         });

@@ -1,41 +1,51 @@
 import React, { useRef, useEffect } from 'react';
 
-const CanvasRenderer = ({ graph, gameState, onNodeClick }) => {
+const CanvasRenderer = ({ graph, gameStates, onNodeClick }) => {
     const canvasRef = useRef(null);
-    const animRef = useRef({
-        currentX: 0,
-        currentY: 0,
-        queue: [], // Queue of {x, y, color} targets from backend
-        initialized: false,
-        lastColor: '#3498db'
-    });
+    const animRef = useRef({}); // Map of entity id to its animation state
 
     // Queue up incoming WebSocket states to ensure every point is reached
     useEffect(() => {
-        if (gameState && gameState.x !== undefined && gameState.y !== undefined) {
-            const nextTarget = {
-                x: Number(gameState.x),
-                y: Number(gameState.y),
-                color: gameState.color || '#3498db'
-            };
+        if (!gameStates) return;
+        
+        Object.values(gameStates).forEach(gameState => {
+            if (gameState && gameState.id !== undefined && gameState.x !== undefined && gameState.y !== undefined) {
+                const id = gameState.id;
+                const nextTarget = {
+                    x: Number(gameState.x),
+                    y: Number(gameState.y),
+                    color: gameState.color || '#3498db'
+                };
 
-            if (!animRef.current.initialized) {
-                animRef.current.currentX = nextTarget.x;
-                animRef.current.currentY = nextTarget.y;
-                animRef.current.lastColor = nextTarget.color;
-                animRef.current.initialized = true;
-            } else {
-                const q = animRef.current.queue;
-                const last = q.length > 0 
-                    ? q[q.length - 1] 
-                    : { x: animRef.current.currentX, y: animRef.current.currentY, color: animRef.current.lastColor };
+                if (!animRef.current[id]) {
+                    animRef.current[id] = {
+                        currentX: nextTarget.x,
+                        currentY: nextTarget.y,
+                        queue: [],
+                        initialized: true,
+                        lastColor: nextTarget.color
+                    };
+                } else {
+                    const anim = animRef.current[id];
+                    const q = anim.queue;
+                    const last = q.length > 0 
+                        ? q[q.length - 1] 
+                        : { x: anim.currentX, y: anim.currentY, color: anim.lastColor };
 
-                if (last.x !== nextTarget.x || last.y !== nextTarget.y || last.color !== nextTarget.color) {
-                    q.push(nextTarget);
+                    if (last.x !== nextTarget.x || last.y !== nextTarget.y || last.color !== nextTarget.color) {
+                        q.push(nextTarget);
+                    }
                 }
             }
-        }
-    }, [gameState]);
+        });
+        
+        // Remove entities that are no longer in gameStates
+        Object.keys(animRef.current).forEach(id => {
+            if (!gameStates[id]) {
+                delete animRef.current[id];
+            }
+        });
+    }, [gameStates]);
 
     useEffect(() => {
         if (!graph || !graph.nodes) return;
@@ -44,37 +54,34 @@ const CanvasRenderer = ({ graph, gameState, onNodeClick }) => {
         let animationFrameId;
 
         const draw = () => {
-            const anim = animRef.current;
-            
-            // Determine active target: front of queue or stay put
-            if (anim.initialized) {
-                let target = anim.queue.length > 0 ? anim.queue[0] : null;
+            // Update animations
+            Object.values(animRef.current).forEach(anim => {
+                if (anim.initialized) {
+                    let target = anim.queue.length > 0 ? anim.queue[0] : null;
 
-                if (target) {
-                    const dx = target.x - anim.currentX;
-                    const dy = target.y - anim.currentY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (target) {
+                        const dx = target.x - anim.currentX;
+                        const dy = target.y - anim.currentY;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    // Snapping threshold: if we are close enough, jump to target to finish the move
-                    // We use a larger threshold if there are more items in the queue to catch up
-                    const snapThreshold = anim.queue.length > 1 ? 5.0 : 0.5;
+                        const snapThreshold = anim.queue.length > 1 ? 5.0 : 0.5;
 
-                    if (dist < snapThreshold) {
-                        anim.currentX = target.x;
-                        anim.currentY = target.y;
-                        anim.lastColor = target.color;
-                        anim.queue.shift();
-                    } else {
-                        // More aggressive interpolation to minimize lag behind sidebar updates
-                        const baseSpeed = 0.4; // Increased from 0.25
-                        const queueInfluence = Math.min(anim.queue.length * 0.1, 0.5);
-                        const factor = Math.min(baseSpeed + queueInfluence, 1.0);
-                        
-                        anim.currentX += dx * factor;
-                        anim.currentY += dy * factor;
+                        if (dist < snapThreshold) {
+                            anim.currentX = target.x;
+                            anim.currentY = target.y;
+                            anim.lastColor = target.color;
+                            anim.queue.shift();
+                        } else {
+                            const baseSpeed = 0.4;
+                            const queueInfluence = Math.min(anim.queue.length * 0.1, 0.5);
+                            const factor = Math.min(baseSpeed + queueInfluence, 1.0);
+                            
+                            anim.currentX += dx * factor;
+                            anim.currentY += dy * factor;
+                        }
                     }
                 }
-            }
+            });
 
             // Clear and redraw EVERYTHING
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -112,23 +119,39 @@ const CanvasRenderer = ({ graph, gameState, onNodeClick }) => {
 
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#ffffff';
                 if (node.type === 'GASSTATION') {
+                    ctx.fillStyle = '#ffffff';
                     ctx.font = '28px sans-serif';
-                    ctx.fillText('⛽', node.x, node.y + 3);
+                    ctx.fillText('⛽', node.x, node.y - 2);
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.fillStyle = '#000000';
+                    ctx.fillText(node.id, node.x, node.y + 13);
                 } else if (node.type === 'WORKSHOP') {
+                    ctx.fillStyle = '#ffffff';
                     ctx.font = '24px sans-serif';
-                    ctx.fillText('🔧', node.x, node.y + 3);
+                    ctx.fillText('🔧', node.x, node.y - 2);
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.fillStyle = '#000000';
+                    ctx.fillText(node.id, node.x, node.y + 13);
+                } else {
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.fillStyle = '#000000';
+                    ctx.fillText(node.id, node.x, node.y);
                 }
             });
 
-            // 3. Draw Interpolated Player
-            if (anim.initialized) {
-                ctx.beginPath();
-                ctx.arc(anim.currentX, anim.currentY, 22, 0, 2 * Math.PI);
-                ctx.fillStyle = anim.lastColor;
-                ctx.fill();
-            }
+            // 3. Draw All Interpolated Players
+            Object.values(animRef.current).forEach(anim => {
+                if (anim.initialized) {
+                    ctx.beginPath();
+                    ctx.arc(anim.currentX, anim.currentY, 22, 0, 2 * Math.PI);
+                    ctx.fillStyle = anim.lastColor;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
 
             animationFrameId = requestAnimationFrame(draw);
         };

@@ -1,6 +1,6 @@
 package org.example.cargame.observer;
 
-import org.example.cargame.CarModel;
+import org.example.cargame.model.HasPositions;
 import org.example.cargame.entity.EntityId;
 import org.example.cargame.snapshot.PositionSnapshot;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class PositionView extends ParentView<CarModel> implements PushObserver<PositionSnapshot> {
+public class PositionView extends ParentView<HasPositions> implements PushObserver<PositionSnapshot> {
     private final Map<EntityId, PositionSnapshot> cache = new ConcurrentHashMap<>();
 
-    public PositionView(CarModel model, ObserverDispatcher dispatcher) {
+    public PositionView(HasPositions model, ObserverDispatcher dispatcher) {
         super(model, dispatcher);
 
         bind();

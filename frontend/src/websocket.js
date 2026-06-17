@@ -1,12 +1,14 @@
-import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
-const WS_URL = '/ws';
+const WS_URL = '/ws-native';
 
 export class GameWebSocket {
   constructor() {
+    const isHttps = window.location.protocol === 'https:';
+    const wsProtocol = isHttps ? 'wss:' : 'ws:';
+    
     this.client = new Client({
-      webSocketFactory: () => new SockJS(WS_URL),
+      brokerURL: `${wsProtocol}//${window.location.host}${WS_URL}`,
       debug: function (str) {
         // console.log(str); // Uncomment for debugging
       },
@@ -16,12 +18,17 @@ export class GameWebSocket {
     });
   }
 
-  connect(onStateUpdate, onConnect) {
+  connect(onStateUpdate, onSyncUpdate, onConnect) {
     this.client.onConnect = () => {
       if (onConnect) onConnect(); // Trigger graph refresh on connection/reconnection
       this.client.subscribe('/topic/game', (message) => {
         if (message.body) {
           onStateUpdate(JSON.parse(message.body));
+        }
+      });
+      this.client.subscribe('/topic/game/sync', (message) => {
+        if (message.body) {
+          if (onSyncUpdate) onSyncUpdate(JSON.parse(message.body));
         }
       });
     };

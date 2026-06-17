@@ -15,18 +15,23 @@ public class GameLoop implements Runnable {
     public void run() {
         long tickDelayMs = 16;
         while (!Thread.currentThread().isInterrupted()) {
-            long start = System.currentTimeMillis();
+            try {
+                long start = System.currentTimeMillis();
 
-            commands.executeAll();
-            physics.update();
-            physics.notifyObservers();
+                commands.executeAll();
+                physics.update();
+                physics.notifyObservers();
 
-            long elapsed = System.currentTimeMillis() - start;
-            long sleepTime = tickDelayMs - elapsed;
-            if (sleepTime > 0) {
-                LockSupport.parkNanos(sleepTime * 1_000_000);
-            } else {
-                Thread.yield();
+                long elapsed = System.currentTimeMillis() - start;
+                long sleepTime = tickDelayMs - elapsed;
+                if (sleepTime > 0) {
+                    LockSupport.parkNanos(sleepTime * 1_000_000);
+                } else {
+                    Thread.yield();
+                }
+            } catch (Exception e) {
+                System.err.println("Exception in GameLoop:");
+                e.printStackTrace();
             }
         }
     }

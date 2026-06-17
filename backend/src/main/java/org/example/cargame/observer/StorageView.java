@@ -1,8 +1,8 @@
 package org.example.cargame.observer;
 
-import org.example.cargame.CarModel;
 import org.example.cargame.entity.EntityId;
 import org.example.cargame.enums.EngineType;
+import org.example.cargame.model.HasStorage;
 import org.example.cargame.snapshot.EnergyStorage;
 import org.example.cargame.snapshot.EnergyStorageSnapshot;
 import org.springframework.stereotype.Component;
@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class StorageView extends ParentView<CarModel> implements PushObserver<EnergyStorageSnapshot> {
+public class StorageView extends ParentView<HasStorage> implements PushObserver<EnergyStorageSnapshot> {
 
     private final Map<EntityId, EnergyStorageSnapshot> cache = new ConcurrentHashMap<>();
 
-    public StorageView(CarModel model, ObserverDispatcher dispatcher) {
+    public StorageView(HasStorage model, ObserverDispatcher dispatcher) {
         super(model, dispatcher);
 
         bind();
@@ -53,9 +53,8 @@ public class StorageView extends ParentView<CarModel> implements PushObserver<En
     }
 
     public Map<EngineType, EnergyStorage> getEnergyStorages(EntityId id) {
-        EnergyStorageSnapshot snap = cache.get(id);  // this is what can be null
+        EnergyStorageSnapshot snap = cache.get(id); // this is what can be null
         return snap != null ? snap.storageList() : Map.of();
     }
-
 
 }

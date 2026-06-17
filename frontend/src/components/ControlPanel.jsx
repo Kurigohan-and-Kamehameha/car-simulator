@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { setColor, setEngine, setSpeed, saveGame, loadGame } from '../api';
 
-const ControlPanel = ({ gameState }) => {
+const ControlPanel = ({ gameState, activeEntityId }) => {
   const [localColor, setLocalColor] = useState('#3498db');
   const [localEngine, setLocalEngine] = useState('FUEL');
   const [localSpeed, setLocalSpeed] = useState(80);
@@ -24,21 +24,21 @@ const ControlPanel = ({ gameState }) => {
     const val = e.target.value;
     setLastManualChange(Date.now());
     setLocalColor(val);
-    setColor(val).catch(console.error);
+    if (activeEntityId !== null) setColor(val, activeEntityId).catch(console.error);
   };
 
   const handleEngineChange = (e) => {
     const val = e.target.value;
     setLastManualChange(Date.now());
     setLocalEngine(val);
-    setEngine(val).catch(console.error);
+    if (activeEntityId !== null) setEngine(val, activeEntityId).catch(console.error);
   };
 
   const handleSpeedChange = (e) => {
     const val = parseFloat(e.target.value);
     setLastManualChange(Date.now());
     setLocalSpeed(val);
-    setSpeed(val).catch(console.error);
+    if (activeEntityId !== null) setSpeed(val, activeEntityId).catch(console.error);
   };
 
   const isWorkshop = gameState?.state === 'WAIT_AT_WORKSHOP';

@@ -19,7 +19,6 @@ public record LoadedGameData(
         Map<EntityId, EnergyStorageSnapshot> storage,
         Map<EntityId, State> states
 ) {
-    // Kompakter Konstruktor für Standardwerte (optional)
     public LoadedGameData() {
         this(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(),
                 new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());

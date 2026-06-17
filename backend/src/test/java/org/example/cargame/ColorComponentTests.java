@@ -2,6 +2,7 @@ package org.example.cargame;
 
 import org.example.cargame.components.ColorComponent;
 import org.example.cargame.entity.EntityId;
+import org.example.cargame.model.CarModel;
 import org.example.cargame.observer.ColorView;
 import org.example.cargame.observer.ObserverDispatcher;
 import org.example.cargame.snapshot.ColorSnapshot;

@@ -47,7 +47,7 @@ body {
   flex: 1;
   padding: 2rem;
   gap: 2rem;
-  max-width: 1400px;
+  max-width: 95%;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
@@ -67,16 +67,17 @@ body {
 }
 
 .canvas-wrapper {
-  width: 100%;
-  max-width: 1000px;
-  position: relative;
+  max-width: 100%;
+  max-height: 80vh;
+  aspect-ratio: 1000 / 800;
   margin: 0 auto;
+  position: relative;
+  display: flex;
 }
 
 .canvas-wrapper canvas {
   width: 100%;
-  height: auto;
-  aspect-ratio: 1000 / 800;
+  height: 100%;
   display: block;
 }
 
@@ -280,3 +281,144 @@ input[type="color"] {
   box-shadow: 0 0px 0px 0px rgba(0, 0, 0, 0.15);
 }
 
+.entity-panel {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 800px;
+}
+
+.entity-panel h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.add-entity-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-entity-section label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.add-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-btn {
+  flex: 0 0 auto;
+  padding: 0.5rem 1rem;
+  font-size: 1.25rem;
+}
+
+.entity-list-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.entity-list-section h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.entity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom Scrollbar */
+.entity-list::-webkit-scrollbar {
+  width: 6px;
+}
+.entity-list::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+  border-radius: 4px;
+}
+.entity-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+.entity-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.no-entities {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.entity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.entity-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.entity-item.active {
+  border-color: var(--accent);
+  background-color: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.entity-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.entity-icon {
+  font-size: 1.25rem;
+}
+
+.entity-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 0.25rem;
+  font-size: 1rem;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
