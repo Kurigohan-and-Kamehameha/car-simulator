@@ -28,8 +28,8 @@ RUN printf "server { \n\
     proxy_set_header Connection \"upgrade\"; \n\
     proxy_set_header Host \$host; \n\
     } \n\
-    location /ws-native/ { \n\
-    proxy_pass http://backend:8080/ws-native/; \n\
+    location /ws-native { \n\
+    proxy_pass http://backend:8080/ws-native; \n\
     proxy_http_version 1.1; \n\
     proxy_set_header Upgrade \$http_upgrade; \n\
     proxy_set_header Connection \"upgrade\"; \n\
