@@ -4,12 +4,14 @@ import org.example.cargame.components.*;
 import org.example.cargame.entity.EntityId;
 import org.example.cargame.enums.ModelType;
 
+import org.example.cargame.model.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CarModel extends Model {
+public class CarModel extends Model implements HasStates, HasPositions, HasEngines, HasStorage, HasSpeeds, HasColors, HasPaths, HasMessages {
     private final Map<EntityId, PositionComponent> positions = new ConcurrentHashMap<>();
     private final Map<EntityId, EnergyStorageComponent> storage = new ConcurrentHashMap<>();
     private final Map<EntityId, ColorComponent> colors = new ConcurrentHashMap<>();
@@ -21,6 +23,7 @@ public class CarModel extends Model {
 
     @Override
     public void removeEntity(EntityId id) {
+        notifyRemoved(id);
         positions.remove(id);
         colors.remove(id);
         engines.remove(id);
