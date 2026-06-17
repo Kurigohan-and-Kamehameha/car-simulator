@@ -39,11 +39,13 @@ public class LifecycleService {
         });
     }
 
-    public void onEntityRemoved(EntityId id) {
+    public void onEntityRemoved(EntityId id, CompletableFuture<Void> future, Runnable onComplete) {
         lifecycleObservers.forEach(o -> o.onEntityRemoved(id));
         dispatcher.dispatch(() -> {
             gameStateView.remove(id);
             eventPublisher.publishEvent(new EntityRemovedEvent(id.getId()));
+            future.complete(null);
+            onComplete.run();
         });
     }
 

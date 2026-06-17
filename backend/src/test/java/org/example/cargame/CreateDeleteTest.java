@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,14 +45,14 @@ public class CreateDeleteTest {
         Node a = new Node("A", 400, 200, null);
         graph.addNode(a);
 
-        Integer newId = createRemoveLayer.createEntity("A").get();
+        Integer newId = createRemoveLayer.createEntity("A").get(5, TimeUnit.SECONDS);
 
         commands.executeAll();
         List<Integer> entitiesAfterCreate = serviceLayer.getAllGameStates().keySet().stream().toList();
 
-        createRemoveLayer.removeEntity(newId);
-
+        CompletableFuture<Void> removeFuture = createRemoveLayer.removeEntity(newId);
         commands.executeAll();
+        removeFuture.get(5, TimeUnit.SECONDS);
 
         List<Integer> entitiesAfterRemove = serviceLayer.getAllGameStates().keySet().stream().toList();
 

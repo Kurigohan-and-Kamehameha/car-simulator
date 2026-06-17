@@ -64,8 +64,8 @@ public class GameRestController {
     }
 
     @DeleteMapping("/removeEntity")
-    public void removeEntity(@RequestParam int id) {
-        createRemoveLayer.removeEntity(id);
+    public void removeEntity(@RequestParam int id) throws Exception {
+        createRemoveLayer.removeEntity(id).get();
     }
 
     @GetMapping("/graph")

@@ -48,20 +48,24 @@ public class CreateRemoveLayer {
         return future;
     }
 
-    public void removeEntity(int id) {
+    public CompletableFuture<Void> removeEntity(int id) {
         updateState.incrementPending();
+        CompletableFuture<Void> future = new CompletableFuture<>();
         boolean submitted = commands.submit(() -> {
             try {
                 EntityId entityId = new EntityId(id);
-                lifecycleService.onEntityRemoved(entityId);
+                lifecycleService.onEntityRemoved(entityId, future, updateState::decrementPending);
                 entityManager.removeEntity(model, entityId);
-            } finally {
+            } catch (Exception e) {
+                future.completeExceptionally(e);
                 dispatcher.dispatch(updateState::decrementPending);
             }
         });
         if (!submitted) {
             updateState.decrementPending();
+            future.completeExceptionally(new IllegalStateException("Server busy, try again"));
         }
+        return future;
     }
 
     public boolean getUpdateInProgress() {
